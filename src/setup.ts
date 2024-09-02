@@ -1,8 +1,5 @@
 import * as THREE from "three";
-// WE WILL USE THIS LOADER
-// import { GLTFLoader } from "three/examples/jsm/Addons.js";
-import { OrbitControls, GLTFLoader } from "three/examples/jsm/Addons.js";
-//WE CAN NOW USE GLTFLoader
+import { OrbitControls /* , GLTFLoader */ } from "three/examples/jsm/Addons.js";
 //
 import GUI from "lil-gui";
 import gsap from "gsap";
@@ -49,7 +46,7 @@ if (canvas) {
   /**
    * Models
    */
-  const gltfLoader = new GLTFLoader();
+  // const gltfLoader = new GLTFLoader();
 
   // ---------------------------------------------
   // ---------------------------------------------
