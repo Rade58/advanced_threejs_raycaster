@@ -1,21 +1,24 @@
 import * as THREE from "three";
-import { OrbitControls /* , GLTFLoader */ } from "three/examples/jsm/Addons.js";
+import { OrbitControls, GLTFLoader } from "three/examples/jsm/Addons.js";
 //
 import GUI from "lil-gui";
-// import gsap from "gsap";
+import gsap from "gsap";
 // import CANNON from "cannon";
 
-// RAYCASTER WITH MOUSECLICK
+// RAYCASTING WITH MODELS
 
-// WE LEARNED HOW TO "RECREATE" MOUSELEVE/ENTER IN PREVIOUS LESSON
-// NOW WE WILL LEARN HOW TO "RECREATE" CLICK
+// previously we were doing reycasting with meshes
+// but what about models
 
-// we will listen to click event anywhere
-// and since we have variable where we keep current intersect reference
-// we can use it to run something depending if that variable holds interect instance
+// quite easy
+// we are going to do it because there are few interesting things that we can learn along the way
 
-// we can also add switch statement for every mesh (every intersected object we have)
-// to run smething diifferent in case of ny of our objects
+// first we load the model
+
+// the nwe will define intersectiong of the model
+
+// we want model to get bigger when we hover it
+// I define on when we click it
 
 /**
  * @description Debug UI - lil-ui
@@ -58,7 +61,19 @@ if (canvas) {
   /**
    * Models
    */
-  // const gltfLoader = new GLTFLoader();
+  const gltfLoader = new GLTFLoader();
+
+  let duckModel: THREE.Group | null = null;
+  gltfLoader.load("/models/Duck/glTF-Binary/Duck.glb", (gltf) => {
+    console.log({ gltf });
+
+    // not this
+    // duckModel = gltf.scene.children[0];
+    duckModel = gltf.scene;
+    duckModel.position.y = -1.2;
+
+    scene.add(gltf.scene);
+  });
 
   // ---------------------------------------------
   // ---------------------------------------------
@@ -87,11 +102,11 @@ if (canvas) {
   // ---------------------------------------------
 
   // TEXTURES
-  const textureLoader = new THREE.TextureLoader();
+  // const textureLoader = new THREE.TextureLoader();
   // const gradientTexture = textureLoader.load("/textures/gradients/3.jpg");
   // gradientTexture.magFilter = THREE.NearestFilter;
 
-  const sphereMatcap = textureLoader.load("/textures/matcaps/3.png");
+  // const sphereMatcap = textureLoader.load("/textures/matcaps/3.png");
 
   // ------ PHYSICS --------------------------------------------------
   // -----------------------------------------------------------------
@@ -231,7 +246,7 @@ if (canvas) {
   // scene.add(floorMesh);
 
   //
-  const object1 = new THREE.Mesh(
+  /* const object1 = new THREE.Mesh(
     new THREE.SphereGeometry(0.5, 16, 16),
     new THREE.MeshBasicMaterial({
       color: "crimson",
@@ -256,7 +271,7 @@ if (canvas) {
 
   object3.position.x = 2;
 
-  scene.add(object1, object2, object3);
+  scene.add(object1, object2, object3); */
 
   // ---- RAYCASTER --------------------------------------------------------
   // -----------------------------------------------------------------------
@@ -415,7 +430,7 @@ if (canvas) {
   );
   scene.add(directionalLightCameraHelper);
 
-  // axHelp.visible = false;
+  axHelp.visible = false;
   directionalLightCameraHelper.visible = false;
 
   // -------------------------------------------------
@@ -594,10 +609,28 @@ if (canvas) {
 
   // handle on click and intersect
   window.addEventListener("click", (_event) => {
-    if (currentIntersect) {
-      // console.log({ currentIntersect });
+    if (currentIntersect && duckModel) {
+      console.log({ currentIntersect });
+      console.log({ duckModel });
 
-      switch (currentIntersect.object) {
+      // currentIntersect.object.scale.setScalar(2);
+      if (currentIntersect.object.scale.x === 1) {
+        gsap.to(currentIntersect.object.scale, {
+          x: 2,
+          y: 2,
+          z: 2,
+          duration: 0.4,
+        });
+      } else {
+        gsap.to(currentIntersect.object.scale, {
+          x: 1,
+          y: 1,
+          z: 1,
+          duration: 0.2,
+        });
+      }
+
+      /* switch (currentIntersect.object) {
         case object1:
           console.log("object 1");
           // object1.material.color.set("blue");
@@ -610,7 +643,8 @@ if (canvas) {
           break;
         default:
           break;
-      }
+      } */
+      return;
     }
   });
 
@@ -625,31 +659,33 @@ if (canvas) {
     //
     const elapsedTime = clock.getElapsedTime();
 
-    // --------------------------------------------------
-    object1.position.y = Math.sin(elapsedTime * 0.3) * 1.5;
-    object2.position.y = Math.sin(elapsedTime * 0.8) * 1.5;
-    object3.position.y = Math.sin(elapsedTime * 1.4) * 1.5;
-
     //
     raycaster.setFromCamera(mouse, camera);
 
-    const objectsToTest = [object1, object2, object3];
-    const intersects = raycaster.intersectObjects(objectsToTest);
+    // const objectsToIntersect = [object1, object2, object3];
 
-    if (intersects.length) {
-      if (!currentIntersect) {
-        console.log("mouse enter");
+    if (duckModel) {
+      const intersects = raycaster.intersectObject(duckModel);
+
+      if (intersects.length) {
+        if (!currentIntersect) {
+          console.log("mouse enter");
+
+          duckModel.position.y += 0.2;
+        }
+
+        currentIntersect = intersects[0];
+      } else {
+        // there is no hover
+
+        if (currentIntersect) {
+          console.log("mouse leave");
+          // currentIntersect.object.scale.setScalar(1);
+          duckModel.position.y -= 0.2;
+        }
+
+        currentIntersect = null;
       }
-
-      currentIntersect = intersects[0];
-    } else {
-      // there is no hover
-
-      if (currentIntersect) {
-        console.log("mouse leave");
-      }
-
-      currentIntersect = null;
     }
 
     // from previous example
@@ -658,7 +694,7 @@ if (canvas) {
       intersect.object.material.color.set("#0000ff");
     }
 
-    for (const object of objectsToTest) {
+    for (const object of objectsToIntersect) {
       if (!intersects.find((intersect) => intersect.object === object)) {
         object.material.color.set("#ff0000");
       }
@@ -670,12 +706,12 @@ if (canvas) {
 
     raycaster.set(rayOrigin, rayDirection);
 
-    const objectsToTest = [object1, object2, object3];
+    const objectsToIntersect = [object1, object2, object3];
 
-    const intersects = raycaster.intersectObjects(objectsToTest);
+    const intersects = raycaster.intersectObjects(objectsToIntersect);
     // console.log(intersects);
 
-    for (const ob of objectsToTest) {
+    for (const ob of objectsToIntersect) {
       ob.material.color.set("#ff0000");
     }
 
