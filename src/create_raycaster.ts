@@ -6,6 +6,15 @@ import GUI from "lil-gui";
 // import CANNON from "cannon";
 
 // For a initial setup we have just three sphere meshes placed close to one another
+// we instatiated raycaster just bellow where we added ouur spheres to the scene
+
+// you'll define two Vector3 instances to define where is raycasters origin and where is it's direction
+// you must normalize the direction vector, which will make it a unit vector (don't understand why, but you need to do it)
+
+// than you have two methods to check or test  raycasters  intersectiong of one object (intersectObject), or to test
+// raycasters intersecting of multiple objects
+
+// A lot of things are uncler to me, wspecially some properties on intersect instance we get by using mentioned method
 
 /**
  * @description Debug UI - lil-ui
@@ -226,7 +235,7 @@ if (canvas) {
     sphereMaterial
   );
 
-  object1.position.x = -2;
+  object1.position.x = -3;
 
   const object2 = new THREE.Mesh(
     new THREE.SphereGeometry(0.5, 16, 16),
@@ -238,7 +247,7 @@ if (canvas) {
     sphereMaterial
   );
 
-  object3.position.x = 2;
+  object3.position.x = 3;
 
   scene.add(object1, object2, object3);
 
@@ -246,6 +255,47 @@ if (canvas) {
   // -----------------------------------------------------------------------
   // -----------------------------------------------------------------------
   // -----------------------------------------------------------------------
+  /**
+   * RAYCASTER
+   */
+  const raycaster = new THREE.Raycaster();
+
+  // if you imagine line between these two dots in space
+  // it i going through your three meshes
+  const rayOrigin = new THREE.Vector3(-3, 0, 0);
+  const rayDirection = new THREE.Vector3(10, 0, 0);
+
+  // Direction needs to be normalized, raycaster needs that
+  // don't understand why, but we need to do this
+
+  console.log(rayDirection.length()); // 10
+  // since we established direction we make it to unit vector
+  // we need to reduce vector to 1, but keep the direction
+  // direction will be kept
+  rayDirection.normalize();
+  console.log(rayDirection.length()); // 1
+
+  raycaster.set(rayOrigin, rayDirection);
+
+  // results are array
+  // testing
+  // const intersect = raycaster.intersectObject(object2);
+  // console.log({ intersect });
+
+  const intersects = raycaster.intersectObjects([object1, object2, object3]);
+  console.log({ intersects });
+
+  // resut is array because in case when ray goes throu donut shape or tube shape for example, ray will
+  // enter object two times
+
+  // LET'S EXPLAIN THE RESULTS OF THE ITEM INSIDE THE ARRAY (intersect or intersects)
+
+  // distance   ---- distance between the origin of the ray and the collision point (no idea what is this, when trying to figure out distance it doesn't match)
+  // face - what face of the geometry was hit by the ray (not used that much by author of workshop)
+  // faceIndex - the index of the face
+  // object - what object is concerned by the collison (It's one of our mesh instance)
+  // point - a Vector3 of the exact position of the collision
+  // uv - the UV coordinates in the geometry
 
   // -----------------------------------------------------------------------
   // -----------------------------------------------------------------------
@@ -388,7 +438,7 @@ if (canvas) {
   );
   scene.add(directionalLightCameraHelper);
 
-  axHelp.visible = false;
+  // axHelp.visible = false;
   directionalLightCameraHelper.visible = false;
 
   // -------------------------------------------------

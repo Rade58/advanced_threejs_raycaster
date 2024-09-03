@@ -5,7 +5,13 @@ import GUI from "lil-gui";
 // import gsap from "gsap";
 // import CANNON from "cannon";
 
-// For a initial setup we have just three sphere meshes placed close to one another
+// moving (aanimating some meshes) and changing their color if they intersect with ray
+
+// testing collison on every frame can be quite heavy, so pay attention when doing this
+// especially if you have a lot of objects
+// try to do it s less as possible
+
+// but when trying to test it on object that are animated you must to it on every frame
 
 /**
  * @description Debug UI - lil-ui
@@ -223,19 +229,25 @@ if (canvas) {
   //
   const object1 = new THREE.Mesh(
     new THREE.SphereGeometry(0.5, 16, 16),
-    sphereMaterial
+    new THREE.MeshBasicMaterial({
+      color: "crimson",
+    })
   );
 
   object1.position.x = -2;
 
   const object2 = new THREE.Mesh(
     new THREE.SphereGeometry(0.5, 16, 16),
-    sphereMaterial
+    new THREE.MeshBasicMaterial({
+      color: "crimson",
+    })
   );
 
   const object3 = new THREE.Mesh(
     new THREE.SphereGeometry(0.5, 16, 16),
-    sphereMaterial
+    new THREE.MeshBasicMaterial({
+      color: "crimson",
+    })
   );
 
   object3.position.x = 2;
@@ -246,6 +258,17 @@ if (canvas) {
   // -----------------------------------------------------------------------
   // -----------------------------------------------------------------------
   // -----------------------------------------------------------------------
+  /**
+   * RAYCASTER
+   */
+  const raycaster = new THREE.Raycaster();
+
+  // const rayOrigin = new THREE.Vector3(-3, 0, 0);
+  // const rayDirection = new THREE.Vector3(10, 0, 0);
+
+  // rayDirection.normalize();
+  // raycaster.set(rayOrigin, rayDirection);
+  //
 
   // -----------------------------------------------------------------------
   // -----------------------------------------------------------------------
@@ -388,7 +411,7 @@ if (canvas) {
   );
   scene.add(directionalLightCameraHelper);
 
-  axHelp.visible = false;
+  // axHelp.visible = false;
   directionalLightCameraHelper.visible = false;
 
   // -------------------------------------------------
@@ -546,7 +569,34 @@ if (canvas) {
 
   const tick = () => {
     //
-    // const elapsedTime = clock.getElapsedTime();
+    const elapsedTime = clock.getElapsedTime();
+
+    // --------------------------------------------------
+    object1.position.y = Math.sin(elapsedTime * 0.3) * 2.5;
+    object2.position.y = Math.sin(elapsedTime * 0.8) * 2.5;
+    object3.position.y = Math.sin(elapsedTime * 1.4) * 2.5;
+
+    //
+    const rayOrigin = new THREE.Vector3(-3, 1, 0);
+    const rayDirection = new THREE.Vector3(10, 1, 0);
+    rayDirection.normalize();
+
+    raycaster.set(rayOrigin, rayDirection);
+
+    const objectsToTest = [object1, object2, object3];
+
+    const intersects = raycaster.intersectObjects(objectsToTest);
+    // console.log(intersects);
+
+    for (const ob of objectsToTest) {
+      ob.material.color.set("#ff0000");
+    }
+
+    for (const intersect of intersects) {
+      // @ts-ignore
+      (intersect.object as THREE.Mesh).material.color.set("#0000ff");
+    }
+
     // const deltaTime = elapsedTime - oldElapsedTime;
     //
     // oldElapsedTime = elapsedTime;
