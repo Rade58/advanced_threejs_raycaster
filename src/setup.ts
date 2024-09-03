@@ -2,8 +2,10 @@ import * as THREE from "three";
 import { OrbitControls /* , GLTFLoader */ } from "three/examples/jsm/Addons.js";
 //
 import GUI from "lil-gui";
-import gsap from "gsap";
-import CANNON from "cannon";
+// import gsap from "gsap";
+// import CANNON from "cannon";
+
+// For a initial setup we have just three sphere meshes placed close to one another
 
 /**
  * @description Debug UI - lil-ui
@@ -57,7 +59,7 @@ if (canvas) {
   // ---------------------------------------------
   // ---------------------------------------------
 
-  const hitSound = new Audio("/sounds/hit.mp3");
+  /* const hitSound = new Audio("/sounds/hit.mp3");
 
   // types are problem in cannon-es, different than in cannon
   const playHitSound = (collision: CANNON.ICollisionEvent) => {
@@ -69,7 +71,7 @@ if (canvas) {
       hitSound.currentTime = 0;
       hitSound.play();
     }
-  };
+  }; */
 
   // ---------------------------------------------
   // ---------------------------------------------
@@ -91,14 +93,14 @@ if (canvas) {
    * Physics
    */
 
-  const world = new CANNON.World();
+  // const world = new CANNON.World();
 
   //
-  world.broadphase = new CANNON.SAPBroadphase(world);
-  world.allowSleep = true;
+  // world.broadphase = new CANNON.SAPBroadphase(world);
+  // world.allowSleep = true;
   //
 
-  world.gravity.set(0, -9.82, 0);
+  // world.gravity.set(0, -9.82, 0);
 
   //
   // -----------------------------------------------------------------
@@ -106,7 +108,7 @@ if (canvas) {
   // -----------------------------------------------------------------
   // -----------------------------------------------------------------
   // -----------------------------------------------------------------
-  const objectsToUpdate: { mesh: THREE.Mesh; body: CANNON.Body }[] = [];
+  // const objectsToUpdate: { mesh: THREE.Mesh; body: CANNON.Body }[] = [];
 
   // -----------------------------------------------------------------
   // -----------------------------------------------------------------
@@ -120,7 +122,7 @@ if (canvas) {
   // const concreteMaterial = new CANNON.Material("concrete");
   // const plasticMaterial = new CANNON.Material("plastic");
 
-  const defaultMaterial = new CANNON.Material("concrete_and_plastic");
+  /* const defaultMaterial = new CANNON.Material("concrete_and_plastic");
 
   const defaultContactMaterial = new CANNON.ContactMaterial(
     // concreteMaterial,
@@ -132,31 +134,31 @@ if (canvas) {
       friction: 0.1, // higher the number it is smoother slide like oil
       restitution: 0.7, // higher the number, the bouncing will be larger
     }
-  );
+  ); */
 
   // instead of this (or you can keep this)
-  world.addContactMaterial(defaultContactMaterial);
+  // world.addContactMaterial(defaultContactMaterial);
   // set defaultContactMaterial instead
-  world.defaultContactMaterial = defaultContactMaterial;
+  // world.defaultContactMaterial = defaultContactMaterial;
 
   // ------------------------------------------
 
   // ---------------------------------------
 
-  const floorShape = new CANNON.Plane();
+  /* const floorShape = new CANNON.Plane();
   const floorBody = new CANNON.Body();
   floorBody.mass = 0;
   floorBody.addShape(floorShape);
-  world.addBody(floorBody);
+  // world.addBody(floorBody);
 
   // floorBody.material = concreteMaterial;
-  floorBody.material = defaultMaterial;
+  // floorBody.material = defaultMaterial;
 
   //
   floorBody.quaternion.setFromAxisAngle(
     new CANNON.Vec3(-1, 0, 0),
     Math.PI * 0.5
-  );
+  ); */
 
   // ------ LIGHTS ---------------------------------------------------
   // -----------------------------------------------------------------
@@ -175,7 +177,7 @@ if (canvas) {
 
   // ---------------------------------------------------------------
   // ---------------------------------------------------------------
-  // -------- GEOMETRIES AND MATERIALS
+  // -------- GEOMETRIES, MATERIALS, MESHES
   // ---------------------------------------------------------------
   // ---------------------------------------------------------------
 
@@ -189,18 +191,18 @@ if (canvas) {
     color: "#3bb09c",
   });
   // FOR BOXES
-  const boxGeometry = new THREE.BoxGeometry(1, 1, 1);
+  /* const boxGeometry = new THREE.BoxGeometry(1, 1, 1);
   const boxMaterial = new THREE.MeshMatcapMaterial({
     // metalness: 0.3,
     // roughness: 0.4,
     // envMap: sphereMatcap,
     matcap: sphereMatcap,
     color: "#dfb3c5",
-  });
+  }); */
 
   // ----------------
 
-  const floorMaterial = new THREE.MeshStandardMaterial({
+  /* const floorMaterial = new THREE.MeshStandardMaterial({
     // color: "#777777",
     color: parameters.floorMaterialColor,
     metalness: 0.3,
@@ -214,9 +216,31 @@ if (canvas) {
   );
 
   // rotate it by -90deg
-  floorMesh.rotation.x = -Math.PI * 0.5;
+  floorMesh.rotation.x = -Math.PI * 0.5; */
 
-  scene.add(floorMesh);
+  // scene.add(floorMesh);
+
+  //
+  const object1 = new THREE.Mesh(
+    new THREE.SphereGeometry(0.5, 16, 16),
+    sphereMaterial
+  );
+
+  object1.position.x = -2;
+
+  const object2 = new THREE.Mesh(
+    new THREE.SphereGeometry(0.5, 16, 16),
+    sphereMaterial
+  );
+
+  const object3 = new THREE.Mesh(
+    new THREE.SphereGeometry(0.5, 16, 16),
+    sphereMaterial
+  );
+
+  object3.position.x = 2;
+
+  scene.add(object1, object2, object3);
 
   // -----------------------------------------------------------------------
   // ---------- PARTICLES --------------------------------------------------
@@ -235,7 +259,7 @@ if (canvas) {
   // --------------------------------------------------------------
   directionalLight.castShadow = true;
   // sphereMesh.castShadow = true;
-  floorMesh.receiveShadow = true;
+  // floorMesh.receiveShadow = true;
 
   directionalLight.shadow.mapSize.width = 1024;
   directionalLight.shadow.mapSize.height = 1024;
@@ -257,9 +281,9 @@ if (canvas) {
 
   //  GUI
 
-  gui.addColor(parameters, "floorMaterialColor").onChange(() => {
+  /* gui.addColor(parameters, "floorMaterialColor").onChange(() => {
     floorMaterial.color.set(parameters.floorMaterialColor);
-  });
+  }); */
 
   /* gui.add(parameters, "createSphere").onChange(() => {
     createSphere(Math.random() * 0.5, {
@@ -412,7 +436,7 @@ if (canvas) {
   // --------------------------------------------------
   // --------------------------------------------------
 
-  function createSphere(
+  /* function createSphere(
     radius: number,
     position: { x: number; y: number; z: number }
   ) {
@@ -435,7 +459,7 @@ if (canvas) {
       material: defaultMaterial,
     });
 
-    body.addEventListener("collide", playHitSound);
+    // body.addEventListener("collide", playHitSound);
 
     // @ts-expect-error Vec3  Vector3 , or object with x y z
     body.position.copy(position);
@@ -449,11 +473,11 @@ if (canvas) {
       mesh,
       body,
     });
-  }
+  } */
 
   //
 
-  function createBox(
+  /* function createBox(
     size: { width: number; height: number; dept: number },
 
     position: { x: number; y: number; z: number }
@@ -479,7 +503,7 @@ if (canvas) {
     });
 
     //
-    body.addEventListener("collide", playHitSound);
+    // body.addEventListener("collide", playHitSound);
 
     // @ts-expect-error vectors
     body.position.copy(position);
@@ -491,7 +515,7 @@ if (canvas) {
       body,
     });
   }
-
+ */
   // createSphere(0.5, { x: 0, y: 4, z: 0 });
 
   /* createSphere(0.5, { x: 1, y: 4, z: 1 });
@@ -509,14 +533,14 @@ if (canvas) {
   const clock = new THREE.Clock();
 
   //
-  let oldElapsedTime = 0;
+  // let oldElapsedTime = 0;
 
   const tick = () => {
     //
-    const elapsedTime = clock.getElapsedTime();
-    const deltaTime = elapsedTime - oldElapsedTime;
+    // const elapsedTime = clock.getElapsedTime();
+    // const deltaTime = elapsedTime - oldElapsedTime;
     //
-    oldElapsedTime = elapsedTime;
+    // oldElapsedTime = elapsedTime;
     //
 
     // ------ UPDATE PHYSICS WORLD ------
@@ -525,20 +549,20 @@ if (canvas) {
     // fixed time step for 60fps
     // to understand what are we doing
     // read this:   https://gafferongames.com/post/fix_your_timestep/
-    world.step(1 / 60, deltaTime, 3); // max sub steps is 3 (read the article to understand this)
+    // world.step(1 / 60, deltaTime, 3); // max sub steps is 3 (read the article to understand this)
 
     // ---------------------------------------------------
     // ----- UPDATE THREEJS WORLD, BY TAKING COORDINATES FROM PHYSICAL WORLD
 
-    for (const element of objectsToUpdate) {
+    /* for (const element of objectsToUpdate) {
       element.mesh.position.copy(element.body.position);
 
       // we allow rotation by doing this
       element.mesh.quaternion.copy(element.body.quaternion);
-    }
+    } */
 
     // same for floor, even floor is static
-    floorMesh.position.copy(floorBody.position);
+    // floorMesh.position.copy(floorBody.position);
 
     // for dumping to work
     orbit_controls.update();
